@@ -43,5 +43,6 @@ def fill_tables():
     # Close the connection to the database
     conn.close()
 
+
 if __name__ == "__main__":
     fill_tables()

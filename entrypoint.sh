@@ -29,7 +29,7 @@ python3 create_tables.py
 python3 fill_tables.py
 
 # Keep the container running
-tail -f /dev/null
+# tail -f /dev/null
 
 # DB_NAME="imdb"
 # CSV_FOLDER="/imdb-benchmark"
@@ -46,7 +46,7 @@ python3 maqp.py --generate_hdf \
     --generate_ensemble \
     --evaluate_cardinalities \
     --samples_per_spn 100000000 100000000 100000000 100000000 \
-    --ensemble_strategy relationship \
+    --ensemble_strategy rdc_based \
     --ensemble_path imdb-benchmark/spn_ensembles \
     --database_name imdb \
     --post_sampling_factor 10 10 5 1 1 \
@@ -61,11 +61,11 @@ python3 maqp.py --generate_hdf \
     --ensemble_location imdb-benchmark/spn_ensembles/ensemble_relationships_imdb-light_100000000.pkl \
     --query_file_location ./benchmarks/job-light/sql/job_light_queries.sql \
     --ground_truth_file_location ./benchmarks/job-light/sql/job_light_true_cardinalities.csv \
-    # --pairwise_rdc_path imdb-benchmark/spn_ensembles/pairwise_rdc.pkl \
-    # --rdc_spn_selection
-    # --database_name imdb \
-    # --ensemble_budget_factor 5 \
-    # --ensemble_max_no_joins 3 \
+    --pairwise_rdc_path imdb-benchmark/spn_ensembles/pairwise_rdc.pkl \
+    --rdc_spn_selection \
+    --database_name imdb \
+    --ensemble_budget_factor 5 \
+    --ensemble_max_no_joins 3 
     
 
 # python3 maqp.py --generate_hdf \
