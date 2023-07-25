@@ -1,34 +1,3 @@
-# FROM ubuntu:22.04
-
-# # Update package lists and install required dependencies
-# RUN apt-get update && apt-get install -y \
-#     python3.7 \
-#     python3-pip \
-#     && apt-get clean
-
-# # Set the default Python version to 3.7
-# RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 1
-
-# # Create a working directory for the application
-# WORKDIR /app
-
-# # Copy the requirements file
-# COPY requirements.txt .
-
-# # Install Python dependencies
-# RUN apt-get update && apt-get install -y build-essential libssl-dev libffi-dev && apt-get install openssl && \
-#     apt install -y libpq-dev gcc python3-dev && python3 -m ensurepip --default-pip && \
-#     python3 -m pip install --upgrade pip && python3 -m pip install pipreqs && \
-#     python3 -m pip install --no-cache-dir -r requirements.txt
-
-# # Copy the application code into the container
-# COPY . .
-
-# # Set the entrypoint command
-# CMD [ "python3", "app.py" ]
-
-
-
 # syntax=docker/dockerfile:1
 
 # Comments are provided throughout this file to help you get started.
@@ -40,6 +9,10 @@ FROM python:${PYTHON_VERSION}-slim as base
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
+# ENV POSTGRES_USER="postgres"
+# ENV POSTGRES_PASSWORD="postgres"
+# ENV POSTGRES_DB="imdb"
+# ENV POSTGRES_PORT=5432
 
 # Keeps Python from buffering stdout and stderr to avoid situations where
 # the application crashes without emitting any logs due to buffering.
@@ -60,6 +33,7 @@ WORKDIR /app
 #     appuser
 
 COPY requirements_python3.8.txt .
+# COPY ./imdb-benchmark/schematext.sql /docker-entrypoint-initdb.d
 
 # Download dependencies as a separate step to take advantage of Docker's caching.
 # Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
@@ -67,7 +41,7 @@ COPY requirements_python3.8.txt .
 # into this layer.
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements_python3.8.txt,target=requirements_python3.8.txt 
-RUN apt-get update && apt-get install -y build-essential libssl-dev libffi-dev && apt-get install openssl && \
+RUN apt update && apt install -y build-essential libssl-dev libffi-dev openssl && \
     apt install -y libpq-dev gcc python3-dev && python -m ensurepip --default-pip && \
     python -m pip install spflow --no-deps && \
     python -m pip install -r requirements_python3.8.txt
@@ -79,7 +53,7 @@ RUN apt-get update && apt-get install -y build-essential libssl-dev libffi-dev &
 COPY . .
 
 # Expose the port that the application listens on.
-EXPOSE 8000
+EXPOSE 5432
 
 # Run the application.
 COPY entrypoint.sh /entrypoint.sh
