@@ -16,6 +16,32 @@ csv_folder = "/imdb-benchmark"
 
 # SQL commands to create tables
 create_table_query = '''
+    CREATE TABLE aka_name (
+    id integer NOT NULL PRIMARY KEY,
+    person_id integer NOT NULL,
+    name character varying,
+    imdb_index character varying(3),
+    name_pcode_cf character varying(11),
+    name_pcode_nf character varying(11),
+    surname_pcode character varying(11),
+    md5sum character varying(65)
+    );
+
+    CREATE TABLE aka_title (
+    id integer NOT NULL PRIMARY KEY,
+    movie_id integer NOT NULL,
+    title character varying,
+    imdb_index character varying(4),
+    kind_id integer NOT NULL,
+    production_year integer,
+    phonetic_code character varying(5),
+    episode_of_id integer,
+    season_nr integer,
+    episode_nr integer,
+    note character varying(72),
+    md5sum character varying(32)
+    );
+
     CREATE TABLE cast_info (
     id integer NOT NULL PRIMARY KEY,
     person_id integer NOT NULL,
@@ -24,6 +50,64 @@ create_table_query = '''
     note character varying,
     nr_order integer,
     role_id integer NOT NULL
+    );
+
+    CREATE TABLE char_name (
+    id integer NOT NULL PRIMARY KEY,
+    name character varying NOT NULL,
+    imdb_index character varying(2),
+    imdb_id integer,
+    name_pcode_nf character varying(5),
+    surname_pcode character varying(5),
+    md5sum character varying(32)
+    );
+
+    CREATE TABLE comp_cast_type (
+    id integer NOT NULL PRIMARY KEY,
+    kind character varying(32) NOT NULL
+    );
+
+    CREATE TABLE company_name (
+    id integer NOT NULL PRIMARY KEY,
+    name character varying NOT NULL,
+    country_code character varying(6),
+    imdb_id integer,
+    name_pcode_nf character varying(5),
+    name_pcode_sf character varying(5),
+    md5sum character varying(32)
+    );
+
+    CREATE TABLE company_type (
+    id integer NOT NULL PRIMARY KEY,
+    kind character varying(32)
+    );
+
+    CREATE TABLE complete_cast (
+    id integer NOT NULL PRIMARY KEY,
+    movie_id integer,
+    subject_id integer NOT NULL,
+    status_id integer NOT NULL
+    );
+
+    CREATE TABLE info_type (
+    id integer NOT NULL PRIMARY KEY,
+    info character varying(32) NOT NULL
+    );
+
+    CREATE TABLE keyword (
+    id integer NOT NULL PRIMARY KEY,
+    keyword character varying NOT NULL,
+    phonetic_code character varying(5)
+    );
+
+    CREATE TABLE kind_type (
+    id integer NOT NULL PRIMARY KEY,
+    kind character varying(15)
+    );
+
+    CREATE TABLE link_type (
+    id integer NOT NULL PRIMARY KEY,
+    link character varying(32) NOT NULL
     );
 
     CREATE TABLE movie_companies (
@@ -46,6 +130,30 @@ create_table_query = '''
     id integer NOT NULL PRIMARY KEY,
     movie_id integer NOT NULL,
     keyword_id integer NOT NULL
+    );
+
+    CREATE TABLE movie_link (
+    id integer NOT NULL PRIMARY KEY,
+    movie_id integer NOT NULL,
+    linked_movie_id integer NOT NULL,
+    link_type_id integer NOT NULL
+    );
+
+    CREATE TABLE name (
+    id integer NOT NULL PRIMARY KEY,
+    name character varying NOT NULL,
+    imdb_index character varying(9),
+    imdb_id integer,
+    gender character varying(1),
+    name_pcode_cf character varying(5),
+    name_pcode_nf character varying(5),
+    surname_pcode character varying(5),
+    md5sum character varying(32)
+    );
+
+    CREATE TABLE role_type (
+    id integer NOT NULL PRIMARY KEY,
+    role character varying(32) NOT NULL
     );
 
     CREATE TABLE title (
@@ -71,6 +179,13 @@ create_table_query = '''
     note character varying
     );
 
+    CREATE TABLE person_info (
+    id integer NOT NULL PRIMARY KEY,
+    person_id integer NOT NULL,
+    info_type_id integer NOT NULL,
+    info character varying NOT NULL,
+    note character varying
+    );
 '''
 
 def create_tables():
@@ -87,22 +202,6 @@ def create_tables():
         # Commit the changes
         conn.commit()
         print("Tables created successfully")
-
-        # Loop through all CSV files in the folder
-        for file in os.listdir(csv_folder):
-            if file.endswith(".csv"):
-                table_name = os.path.splitext(file)[0]
-
-                 # Construct the COPY command and execute it
-                try:
-                    copy_command = f"COPY {table_name} FROM %s WITH (FORMAT csv, HEADER false, ESCAPE '\\', ENCODING 'utf-8', QUOTE '\"');"
-                    with open(os.path.join(csv_folder, file), 'r') as csv_file:
-                        cursor.copy_expert(copy_command, csv_file)
-                    conn.commit()
-                    print(f"Data imported into table {table_name}")
-                except Exception as e:
-                    conn.rollback()
-                    print(f"Error: Unable to import data into table {table_name} - {e}")
 
     except (Exception, psycopg2.Error) as error:
         print("Error while creating tables:", error)
