@@ -8,6 +8,14 @@ Benjamin Hilprecht, Andreas Schmidt, Moritz Kulessa, Alejandro Molina, Kristian 
 
 ![DeepDB Overview](baselines/plots/overview.png "DeepDB Overview")
 
+# Docker
+
+To configure docker, you need to have a docker engine running. The simplest way to do that and manage your volumes is to install Docker Desktop. Once you have that running, and the Job Dataset specified later imported into 'imdb-benchmark' folder in your directory, you simply need to navigate to the directory into which the repository has been cloned and use the command
+```
+docker compose up
+```
+This will run the entire code and generate an example using the IMDB dataset.
+
 # Setup
 Tested with python3.7 and python3.8
 ```
